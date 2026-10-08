@@ -1,0 +1,8 @@
+node_modules
+dist
+.vercel
+.DS_Store
+.env
+*.log
+public/basis
+public/draco
