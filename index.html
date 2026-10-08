@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Walkable Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;700;800&family=Caveat:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="load"><i></i></div>
+    <div id="labels"></div>
+
+    <button id="menu" type="button" class="glass" aria-expanded="false" aria-controls="panel">
+      <span id="mark"></span><b>Menu</b>
+    </button>
+    <div id="scrim" hidden></div>
+
+    <aside id="panel" class="glass" aria-label="Menu" inert>
+      <header>
+        <div id="brand">
+          <span id="mark2"></span>
+          <div><b id="name"></b><i id="sub"></i></div>
+        </div>
+        <button id="pclose" type="button" class="x" aria-label="Close menu">&times;</button>
+      </header>
+      <div class="scroll">
+        <div id="search">
+          <input id="q" type="search" autocomplete="off" aria-label="Search" />
+          <ul id="results" hidden></ul>
+        </div>
+
+        <h4>Go to</h4>
+        <nav id="pills" aria-label="Stations"></nav>
+
+        <h4>Time of day</h4>
+        <div id="time">
+          <input id="tl" type="range" min="0" max="24" step="0.05" aria-label="Time of day" />
+          <span id="clock">10:30</span>
+          <button id="tplay" type="button" class="pill">Play</button>
+          <button id="tmus" type="button" class="pill" aria-pressed="false" aria-label="Music">
+            &#9834;
+          </button>
+        </div>
+
+        <h4>Preferences</h4>
+        <div id="switches" class="switches"></div>
+
+        <h4>Explore</h4>
+        <p id="stats" class="stats"></p>
+        <div id="tiles" class="tiles"></div>
+        <p id="topics" class="chips" hidden></p>
+        <p id="status">Standing</p>
+      </div>
+    </aside>
+
+    <div id="dock" class="glass" hidden></div>
+    <section id="card" class="glass" hidden aria-live="polite"></section>
+    <p id="hint">
+      Touch: hold the left side to walk, drag the right side to look. Open the menu for the timeline, search
+      and settings.
+    </p>
+    <div id="joy"><div id="knob"></div></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
