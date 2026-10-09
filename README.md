@@ -138,7 +138,7 @@ scripts/
 public/assets/        your images, textures, models and HDRI
 ```
 
-`src/world.js` is one large file with a header comment per section: lights, sky dome, RGB system, room shell, stations, living area, dining table and notebook, workstation, room fill, wall decor, outside (day and night), time of day, weather and the update loop. Search for the header to jump to a section.
+`src/world.js` is one large file with a one-line header per section: lights, sky dome, RGB system, room shell, stations, living area, dining table and notebook, workstation, room fill, wall decor, outside (day and night), time of day, weather and the update loop. Search for the header to jump to a section.
 
 ## License
 

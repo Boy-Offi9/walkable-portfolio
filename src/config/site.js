@@ -1,18 +1,17 @@
-// The ONLY file you need to edit. Field names match Boy-Offi9/portfolio-template,
-// so you can copy name, bio, links, skills and projects straight across.
+// Edit this file to make the portfolio yours.
 export const site = {
   name: 'Ada Rivera',
   role: 'Creative Developer',
   tagline: 'I build interfaces you can walk through.',
   bio: 'Mock data: replace this with a few sentences about you. Ada designs and ships interactive web experiences, from tiny tools to full 3D worlds.',
-  accentColor: '34 211 238', // "R G B", no commas. Reskins the whole world and the UI.
+  accentColor: '34 211 238', // "R G B", no commas
   email: 'ada@example.com',
   links: [
     { label: 'GitHub', url: 'https://github.com/your-handle' },
     { label: 'Writing', url: 'https://example.com/blog' },
   ],
   skills: ['JavaScript', 'three.js', 'WebGL', 'Node.js', 'Design systems', 'Accessibility'],
-  // Brainstorm notes: shown as starred lines on the notebook's left page. Make them yours.
+  // Notebook brainstorm lines
   ideas: [
     'Voice-guided tour of the room',
     'Live GitHub activity on the wall',
@@ -27,8 +26,8 @@ export const site = {
       description: 'Mock project: a local-first notes app that links ideas into a browsable star map.',
       tags: ['Vite', 'IndexedDB', 'Canvas'],
       url: 'https://example.com/orbit-notes',
-      image: '', // local path (assets/projects/x.png) or full image URL
-      repo: '', // or "owner/name" to try that repo's GitHub preview card
+      image: '', // file under public/ or a full URL
+      repo: '', // or "owner/name" for a GitHub preview
     },
     {
       title: 'Signal Garden',
@@ -63,29 +62,27 @@ export const site = {
       repo: '',
     },
   ],
-  // Live weather and local time for this city (Open-Meteo, no key). Set to null to turn it off.
+  // Live weather and local time. Set to null to turn off.
   weather: { lat: 51.5074, lon: -0.1278, label: 'London' },
 
-  // OPTIONAL HD assets. Leave a value "" (or delete a section) to keep the built-in procedural look.
-  // Put files in public/assets/ and use paths WITHOUT a leading slash, e.g. "assets/textures/floor_color.jpg".
-  // Textures can be .jpg .png .webp or .ktx2 (smallest on the GPU). Aim for 1024px.
+  // Optional HD assets. Leave "" to keep the built-in look. Files go in public/assets/, paths have no leading slash.
   assets: {
-    hdri: '', // optional equirectangular .hdr for reflections, e.g. "assets/hdri/room_1k.hdr" (Poly Haven HDRIs are CC0)
+    hdri: '',
     floor: { color: '', normal: '', rough: '', repeat: [4, 5] },
-    walls: { color: '', normal: '', rough: '', repeat: [1, 1] }, // all plaster surfaces. 1 tile = 2 m on every wall and the ceiling
-    desk: { color: '', normal: '', rough: '', repeat: [1, 1] }, // all wood furniture. 1 tile = 0.9 m
+    walls: { color: '', normal: '', rough: '', repeat: [1, 1] }, // 1 tile = 2 m
+    desk: { color: '', normal: '', rough: '', repeat: [1, 1] }, // 1 tile = 0.9 m
     models: [
       // { url: "assets/models/chair.glb", position: [-1.07, 0, -3.45], rotationY: 0.35, scale: 1,
-      //   replace: "chair",                 // hides the built-in chair
-      //   blocker: [-1.5, -0.6, -3.9, -3.0] // optional [x0, x1, z0, z1] area visitors cannot walk through
+      //   replace: "chair",
+      //   blocker: [-1.5, -0.6, -3.9, -3.0]
       // },
     ],
   },
   world: {
-    name: 'Orbital Archive', // shown in the top bar and station counter
-    mark: 'OA', // two letters for the logo tile
+    name: 'Orbital Archive',
+    mark: 'OA', // two letters
     subtitle: 'Portfolio world',
-    startHour: 10.5, // 0-24, the hour you arrive at (10.5 = 10:30)
-    dayLengthSeconds: 120, // real seconds for a full day when you press Play
+    startHour: 10.5, // 0-24
+    dayLengthSeconds: 120, // seconds per day
   },
 };

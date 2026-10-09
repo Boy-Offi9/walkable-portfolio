@@ -157,7 +157,7 @@ export function buildWorld(R, site, opts = {}) {
   const cyl = (r1, r2, h, seg, mat, x, y, z, p) =>
     put(new THREE.CylinderGeometry(r1, r2, h, seg), mat, x, y, z, p);
   const neon = new THREE.MeshBasicMaterial({ color: accent });
-  // Plant kit: curved leaf blade, leaf materials, ceramic pots, rosettes
+  // ---- Plants ----
   const leafGeo = (() => {
     const g = new THREE.PlaneGeometry(0.2, 0.42, 4, 8),
       p = g.attributes.position;
@@ -222,7 +222,7 @@ export function buildWorld(R, site, opts = {}) {
   rgbC.position.set(1.4, 1.15, 3.4);
   scene.add(rgbA, rgbB, rgbC);
 
-  // ---- Sky dome (sun, moon, stars, gradient) ----
+  // ---- Sky dome ----
   const skyU = {
     top: { value: new THREE.Color() },
     hor: { value: new THREE.Color() },
@@ -256,7 +256,7 @@ gl_FragColor=vec4(c,1.);
   sky.frustumCulled = false;
   scene.add(sky);
 
-  // ---- RGB system: strips, hex panels and rainbow-mapped parts all cycle color and brighten at night ----
+  // ---- RGB lighting ----
   const rgb = [],
     rbMats = [],
     rgbMat = off => {
@@ -326,7 +326,7 @@ gl_FragColor=vec4(c,1.);
   bx(8, 0.1, 0.03, trim, 0, 0.05, 4.97, room, false);
   bx(0.03, 0.1, 9.9, trim, -3.97, 0.05, 0, room, false);
   bx(8, 0.1, 0.03, trim, 0, 0.05, -4.97, room, false);
-  // Glass window: a tinted, glossy pane plus a glare streak that picks up the RGB glow at night
+  // ---- Window glass ----
   const glass = new THREE.Mesh(
     new THREE.PlaneGeometry(3.2, 1.6),
     new THREE.MeshPhysicalMaterial({
@@ -373,7 +373,7 @@ gl_FragColor=vec4(c,1.);
   bx(0.05, 2.3, 0.55, curt, 3.88, 1.45, -2.95, room);
   bx(0.05, 2.3, 0.55, curt, 3.88, 1.45, 0.95, room);
   bx(0.03, 0.03, 4.6, metal, 3.86, 2.65, -1, room, false);
-  // Ceiling cove LEDs and ceiling lights
+  // ---- Ceiling lights ----
   for (let k = 0; k < 4; k++) {
     bx(1.95, 0.04, 0.06, rgbMat(k * 0.08), -2.925 + k * 1.95, 2.96, -4.94, room, false);
     bx(1.95, 0.04, 0.06, rgbMat(0.32 + k * 0.08), -2.925 + k * 1.95, 2.96, 4.94, room, false);
@@ -392,7 +392,7 @@ gl_FragColor=vec4(c,1.);
     false
   );
   rug.rotation.x = -Math.PI / 2;
-  // Night-only neon outline traced on the rug (cyan diamonds, magenta border), plus drifting dust that catches the light
+  // ---- Rug and dust ----
   const ledC = cvs(1024, 832),
     ledX = ledC.getContext('2d'),
     LW = 1024,
@@ -542,7 +542,7 @@ gl_FragColor=vec4(c,1.);
     return t;
   };
 
-  // Smart TV home screen (About)
+  // ---- Smart TV screen ----
   const tvTex = screen(1024, 576, (x, W, H) => {
     const g = x.createLinearGradient(0, 0, W, H);
     g.addColorStop(0, '#0a1020');
@@ -610,7 +610,7 @@ gl_FragColor=vec4(c,1.);
       x.textAlign = 'left';
     });
   });
-  // Tablet home screen (Skills)
+  // ---- Tablet screen ----
   const tabTex = screen(640, 440, (x, W, H) => {
     const g = x.createLinearGradient(0, 0, W, H);
     g.addColorStop(0, '#171a3a');
@@ -647,7 +647,7 @@ gl_FragColor=vec4(c,1.);
       x.fill();
     });
   });
-  // PC monitor: terminal window (Contact) over animated code rain
+  // ---- Terminal screen ----
   const PWd = 640,
     PHt = 360,
     rainCv = cvs(PWd, PHt),
@@ -809,7 +809,7 @@ gl_FragColor=vec4(c,1.);
   rx.fillRect(0, 0, PWd, PHt);
   for (let i = 0; i < 24; i++) stepRain();
 
-  // ---- Living area: TV on the wall, cabinet, sofa facing it, coffee table ----
+  // ---- Living area ----
   const tvG = new THREE.Group();
   tvG.position.set(-3.93, 1.4, 1.2);
   tvG.rotation.y = Math.PI / 2;
@@ -877,7 +877,7 @@ gl_FragColor=vec4(c,1.);
   remote.userData.m = 0;
   cyl(0.07, 0.05, 0.08, 12, std(0xb5654a, 0.9), -2.4, 0.44, 1.2, room);
 
-  // ---- Dining table: notebook (all projects), tablet (skills), mug, flowers ----
+  // ---- Dining table ----
   bx(0.95, 0.035, 1.7, wood, 2.55, 0.7475, -1, room);
   bx(0.91, 0.02, 1.66, walnut, 2.55, 0.72, -1, room);
   bx(0.97, 0.012, 1.72, walnut, 2.55, 0.7655 - 0.0155, -1, room, false);
@@ -947,7 +947,7 @@ gl_FragColor=vec4(c,1.);
   tabS.position.set(0, 0.09, 0.0055);
   lean.add(tabS);
 
-  // Notebook: one book holds every project (right page) with a brainstorm mind map (left page)
+  // ---- Notebook ----
   const PW = 512,
     PH = 704,
     imgs = [],
@@ -1420,7 +1420,7 @@ gl_FragColor=vec4(c,1.);
     },
   };
 
-  // ---- Workstation: a clean, normal desk by day; a full cyber rig grows in at night ----
+  // ---- Workstation ----
   const deploy = [],
     glowL = [],
     halos = [],
@@ -1482,7 +1482,7 @@ gl_FragColor=vec4(c,1.);
   bx(2.3, 0.015, 0.015, rgbMat(0.0), -2.2, 0.7, -4.2, room, false);
   bx(2.3, 0.02, 0.02, rgbMat(0.4), -2.2, 0.8, -4.94, room, false);
 
-  // Main monitor (always there): the interactive terminal lives here
+  // ---- Main monitor ----
   const mon = new THREE.Group();
   mon.position.set(-2.2, 0.76, -4.65);
   room.add(mon);
@@ -1502,7 +1502,7 @@ gl_FragColor=vec4(c,1.);
       x < -2 ? 0.2 : -0.2;
   });
 
-  // PC tower on the floor: pale case by day, dark glass-and-RGB build by night
+  // ---- PC tower ----
   const tower = new THREE.Group();
   tower.position.set(-0.74, 0, -4.55);
   room.add(tower);
@@ -1629,7 +1629,7 @@ gl_FragColor=vec4(c,1.);
     fans.push(sp);
   });
 
-  // Ergonomic chair (mesh back, armrests); the RGB spine strip is only visible at night
+  // ---- Office chair ----
   const fab = std(0x2b3139, 0.9),
     meshC = (() => {
       const c = cvs(32, 32),
@@ -1677,7 +1677,7 @@ gl_FragColor=vec4(c,1.);
     bx(0.075, 0.03, 0.28, fab, x, 0.735, -0.04, chair);
   });
 
-  // DAY props: white keyboard and mouse, lamp, mug, plant, phone, notebook, prints and a shelf
+  // ---- Day desk ----
   const dayDesk = pivot(-2.2, 0.76, -4.3, false),
     kdC = cvs(256, 80),
     kdx = kdC.getContext('2d');
@@ -1767,7 +1767,7 @@ gl_FragColor=vec4(c,1.);
   bx(0.16, 0.1, 0.12, std(0xa8402b, 0.7), -0.5, -0.32, 0.08, dayWall);
   cyl(0.05, 0.04, 0.09, 12, std(0xe8e4dc, 0.4), 0.8, -0.325, 0.08, dayWall);
 
-  // NIGHT rig: RGB keyboard, pad, headset, two side monitors, an ultrawide, a wall of screens, a hologram projector, a drone
+  // ---- Night rig ----
   const nA = pivot(-2.2, 0.76, -4.3, true);
   bx(0.46, 0.012, 0.15, dark, 0, 0.006, 0.1, nA);
   const kg = new THREE.Mesh(new THREE.PlaneGeometry(0.44, 0.13), rbMat());
@@ -1892,7 +1892,7 @@ gl_FragColor=vec4(c,1.);
     rotors.push(r);
   });
 
-  // ---- Bookshelf, plants, clock ----
+  // ---- Bookshelf and clock ----
   bx(0.03, 2.1, 1.6, walnut, -3.96, 1.05, 3.4, room);
   [-0.785, 0.785].forEach(o => bx(0.35, 2.1, 0.03, walnut, -3.8, 1.05, 3.4 + o, room));
   [0.03, 0.45, 0.9, 1.35, 1.8, 2.1].forEach(y => bx(0.35, 0.03, 1.6, walnut, -3.8, y, 3.4, room));
@@ -1960,7 +1960,7 @@ gl_FragColor=vec4(c,1.);
   bx(0.014, 0.12, 0.004, metal, 0, 0.06, 0, hourH, false);
   bx(0.009, 0.18, 0.004, metal, 0, 0.09, 0, minH, false);
 
-  // ---- Filling the big room: bar, fridge, armchair, lamp, server rack, 3D printer, holo table, shelves, art, gadgets ----
+  // ---- Room fill ----
   const grp = (x, y, z, ry = 0, p = room) => {
     const g = new THREE.Group();
     g.position.set(x, y, z);
@@ -2030,7 +2030,7 @@ gl_FragColor=vec4(c,1.);
     slats = pbrT(PBR.wood, 0.5, 0x6b4a38),
     lth = pbrT(PBR.leather, 0.5, 0x9a5b3c);
 
-  // Bar counter, stools, coffee machine, smart hub, back shelf with bottles, neon sign
+  // ---- Bar ----
   bx(2.4, 1.0, 0.6, slats, 1.95, 0.5, 4.7, room);
   bx(2.5, 0.04, 0.72, quartz, 1.95, 1.02, 4.66, room);
   bx(2.3, 0.02, 0.02, rgbMat(0.55), 1.95, 0.08, 4.38, room, false);
@@ -2115,13 +2115,13 @@ gl_FragColor=vec4(c,1.);
   room.add(sign);
   halo(1.95, 2.4, 4.8, 2.6, 0.85, 0.55);
 
-  // Smart fridge with a glowing display, and a tall plant beside the bar
+  // ---- Fridge ----
   bx(0.7, 1.8, 0.7, metalL, 0.3, 0.9, 4.62, room);
   bx(0.012, 1.0, 0.012, dark, 0.3, 0.4, 4.265, room);
   bx(0.03, 0.6, 0.03, metal, 0.52, 1.15, 4.25, room);
   bx(0.22, 0.14, 0.008, glow(0x6fd8ff, 0.5, 1.1), 0.3, 1.38, 4.266, room, false);
 
-  // Armchair by the window with a side table and an arc floor lamp
+  // ---- Armchair ----
   const ac = grp(3.1, 0, 1.7, 2.82);
   bx(0.75, 0.16, 0.72, lth, 0, 0.34, 0, ac);
   bx(0.75, 0.5, 0.14, lth, 0, 0.66, -0.3, ac).rotation.x = -0.12;
@@ -2142,7 +2142,7 @@ gl_FragColor=vec4(c,1.);
   bx(0.015, 0.015, 0.9, metalL, 3.65, 1.7, 2.45, room);
   cyl(0.08, 0.2, 0.18, 18, glow(0xffe6c0, 0.55, 1.2), 3.65, 1.6, 2.0, room);
 
-  // North wall: server rack with blinking LEDs, and a 3D printer on a workbench
+  // ---- Server rack and 3D printer ----
   bx(0.62, 1.8, 0.62, dark, 0.25, 0.9, -4.65, room);
   const unit = std(0x151a22, 0.4, 0.7);
   for (let u = 0; u < 8; u++) bx(0.56, 0.13, 0.01, unit, 0.25, 0.3 + u * 0.17, -4.335, room);
@@ -2252,7 +2252,7 @@ gl_FragColor=vec4(c,1.);
   );
   plant(3.5, -4.3, 0.9);
 
-  // Centre of the room: a pedestal table. A flower vase by day, a holographic city by night
+  // ---- Hologram table ----
   const ht = grp(0.9, 0, 2.0);
   cyl(0.3, 0.36, 0.04, 24, metal, 0, 0.02, 0, ht);
   cyl(0.08, 0.12, 0.8, 16, dark, 0, 0.42, 0, ht);
@@ -2319,7 +2319,7 @@ gl_FragColor=vec4(c,1.);
   cityG.add(beam);
   halo(0.9, 1.3, 2.0, 1.4, 0.5, 0.45);
 
-  // East wall shelves with gadgets, south wall art, dining pendants, TV soundbar and speaker, tiny helpers
+  // ---- Shelves, art and pendants ----
   [1.25, 1.65, 2.05].forEach(y => bx(0.24, 0.03, 1.6, walnut, 3.88, y, 2.7, room));
   bx(0.012, 0.012, 1.58, rgbMat(0.2), 3.99, 2.02, 2.7, room, false);
   [
@@ -2382,7 +2382,7 @@ gl_FragColor=vec4(c,1.);
   cyl(0.04, 0.04, 0.03, 12, dark, 0, 0.1, 0.02, vac);
   cyl(0.02, 0.02, 0.01, 8, rgbMat(0.35), 0.09, 0.085, 0, vac, false);
 
-  // ---- Wall decor, door, desk clutter, light beams, soft furnishings ----
+  // ---- Wall decor and furnishings ----
   const tx2 = (w, h, fn, rep) => {
     const c = cvs(w, h),
       x = c.getContext('2d');
@@ -2441,7 +2441,7 @@ gl_FragColor=vec4(c,1.);
     return m;
   };
 
-  // Whiteboard with a system-design sketch (west wall) and marker tray
+  // ---- Whiteboard ----
   const wbT = tx2(640, 400, (x, W, H) => {
     x.fillStyle = '#f3f5f6';
     x.fillRect(0, 0, W, H);
@@ -2537,7 +2537,7 @@ gl_FragColor=vec4(c,1.);
   );
   bx(0.02, 0.06, 0.1, white, -3.95, 1.235, -1.05, room);
 
-  // Cork board with polaroids, sticky notes and red string
+  // ---- Cork board ----
   const corkT = tx2(512, 360, (x, W, H) => {
     x.fillStyle = '#b98757';
     x.fillRect(0, 0, W, H);
@@ -2628,12 +2628,12 @@ gl_FragColor=vec4(c,1.);
   decal(corkT, 1.0, 0.7, -3.958, 1.72, -3.05, Math.PI / 2, { roughness: 1 });
   bx(0.03, 0.74, 1.06, walnut, -3.985, 1.72, -3.05, room);
 
-  // Slat panel with backlight strips behind the TV
+  // ---- TV slat panel ----
   bx(0.02, 2.4, 2.8, std(0x15181c, 0.9), -3.99, 1.4, 1.2, room);
   for (let k = 0; k < 22; k++) bx(0.03, 2.4, 0.07, slats, -3.972, 1.4, -0.1 + k * 0.126, room);
   [-0.12, 2.52].forEach((z, i) => bx(0.012, 2.4, 0.02, rgbMat(0.15 + i * 0.4), -3.96, 1.4, z, room, false));
 
-  // Project poster gallery (east wall, north)
+  // ---- Poster gallery ----
   [0, 1, 2].forEach(i => {
     const p = prj(i),
       hue = (i * 80 + 190) % 360;
@@ -2665,7 +2665,7 @@ gl_FragColor=vec4(c,1.);
     bx(0.03, 0.68, 0.5, i === 1 ? walnut : frameM, 3.985, 1.85, z, room);
   });
 
-  // Entrance door (south wall), mat, coat hooks
+  // ---- Entrance door ----
   bx(1.05, 2.12, 0.03, trim, -3.1, 1.06, 4.985, room);
   bx(0.92, 2.05, 0.05, walnut, -3.1, 1.025, 4.97, room);
   [1.55, 0.6].forEach(y => bx(0.7, y === 1.55 ? 0.7 : 0.8, 0.012, std(0x5a3f31, 0.7), -3.1, y, 4.942, room));
@@ -2704,7 +2704,7 @@ gl_FragColor=vec4(c,1.);
   cyl(0.06, 0.06, 0.03, 14, std(0xe8553a, 0.7), -2.28, 1.56, 4.92, room);
   bx(0.2, 0.3, 0.1, std(0xe8553a, 0.7), -2.1, 1.38, 4.92, room);
 
-  // Desk clutter: lamp, pen cup, duck, sticky pad, drawer unit, cables, speakers
+  // ---- Desk clutter ----
   const cup = grp(-3.3, 0.765, -4.78);
   cyl(0.04, 0.035, 0.1, 14, std(0x3c4a5a, 0.5, 0.2), 0, 0.05, 0, cup);
   [
@@ -2740,7 +2740,7 @@ gl_FragColor=vec4(c,1.);
     cyl(0.014, 0.014, 0.004, 12, dark, x, 0.95, -4.725, room).rotation.x = Math.PI / 2;
   });
 
-  // Dining: pendant light cones, glow pool, jute rug
+  // ---- Dining lights and rug ----
   [-1.6, -1.0, -0.4].forEach(z => cone(2.55, 1.96, z, 0.12, 0.5, 1.18, 0xffe2b0, 0.06, 0.14));
   pool(2.55, 0.768, -1, 1.5, 0xffd9a0, 0.3, 0.55);
   {
@@ -2754,7 +2754,7 @@ gl_FragColor=vec4(c,1.);
     });
   }
 
-  // Living: throw blanket, pillows, coffee table props
+  // ---- Sofa and coffee table ----
   const plaid = tx2(
     64,
     64,
@@ -2797,7 +2797,7 @@ gl_FragColor=vec4(c,1.);
   put(new THREE.SphereGeometry(0.009, 8, 6), glow(0xffb347, 1.2, 1.6), -2.25, 0.47, 1.06, room, false);
   pool(-2.25, 0.403, 1.06, 0.45, 0xffb347, 0.12, 0.22);
 
-  // Window: sheer curtains, rod, sill plants
+  // ---- Curtains and sill plants ----
   cyl(0.012, 0.012, 4.2, 8, dark, 3.93, 2.68, -1, room).rotation.x = Math.PI / 2;
   [-3.1, 1.1].forEach(z => put(new THREE.SphereGeometry(0.024, 10, 8), metalL, 3.93, 2.68, z, room, false));
   const curtains = [-2.88, 0.88].map(z => {
@@ -2839,7 +2839,7 @@ gl_FragColor=vec4(c,1.);
     }
   });
 
-  // Kitchen bits on the bar
+  // ---- Kitchen ----
   cyl(0.07, 0.09, 0.18, 14, metalL, 2.95, 1.13, 4.65, room);
   cyl(0.05, 0.07, 0.04, 14, dark, 2.95, 1.24, 4.65, room);
   bx(0.012, 0.1, 0.05, dark, 3.03, 1.14, 4.65, room).rotation.z = -0.2;
@@ -2847,7 +2847,7 @@ gl_FragColor=vec4(c,1.);
   bx(0.2, 0.14, 0.13, std(0xd9534f, 0.4, 0.3), 1.55, 1.11, 4.8, room);
   [-0.04, 0.04].forEach(o => bx(0.02, 0.006, 0.09, dark, 1.55 + o, 1.182, 4.8, room, false));
 
-  // Gadgets: laptop, stream deck, headphones, smart speaker, air purifier, thermostat, shelf curios, game pad, better robot vacuum, floor plants
+  // ---- Gadgets ----
   const lapS = makeScreen('code', PAL(2), 256, 144);
   lapS.paint(0);
   redo.push(() => lapS.paint(0));
@@ -3125,7 +3125,7 @@ gl_FragColor=vec4(c,1.);
   cyl(0.02, 0.02, 0.004, 8, std(0xd6342c, 0.6), -0.11, 0.012, 0.12, vac);
   snake(-3.7, -2.35, 0.8);
 
-  // Sun shafts through the window (daytime only); direction follows the sun
+  // ---- Sun shafts ----
   const shaftTex = tx2(32, 128, (x, W, H) => {
     const g = x.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, 'rgba(255,244,214,.85)');
@@ -3195,7 +3195,7 @@ gl_FragColor=vec4(c,1.);
     });
   };
 
-  // ---- Outside: DAY (house, bench, trees) ----
+  // ---- Outside: day ----
   const day = new THREE.Group(),
     night = new THREE.Group();
   scene.add(day, night);
@@ -3339,7 +3339,7 @@ gl_FragColor=vec4(c,1.);
     const h = put(new THREE.SphereGeometry(r, 16, 10), std(0x6f9a68, 1), x, 0, z, day, false);
     h.scale.set(1.6, 0.45, 1.3);
   });
-  // Garden, hedges, flower bed, pines, a street with moving cars, neighbours across the road, birds
+  // ---- Garden and street ----
   const hedge = new THREE.InstancedMesh(new THREE.SphereGeometry(0.42, 9, 7), std(0x2f6b3a, 0.9), 16),
     flw = new THREE.InstancedMesh(new THREE.SphereGeometry(0.07, 6, 5), std(0xffffff, 0.7), 46);
   let hi2 = 0;
@@ -3464,7 +3464,7 @@ gl_FragColor=vec4(c,1.);
     birds.push(b);
   }
 
-  // ---- Outside: NIGHT (sci-fi city) ----
+  // ---- Outside: night ----
   put(new THREE.PlaneGeometry(400, 400), std(0x07090f, 0.35, 0.6), 60, -0.03, 0, night, false).rotation.x =
     -Math.PI / 2;
   const wc = cvs(128, 128),
@@ -3606,7 +3606,7 @@ gl_FragColor=vec4(c,1.);
     night.add(g);
     beams.push(g);
   });
-  // Night street life: wet asphalt roads, street lamps, neon light spill on the ground, a monorail, more holo ads
+  // ---- Night street ----
   const roadAt = (x, z, w, d) => {
     const r = put(
       new THREE.PlaneGeometry(w, d),
@@ -3769,7 +3769,7 @@ gl_FragColor=vec4(c,1.);
     hourH.rotation.z = -((h % 12) / 12) * 6.2832;
     minH.rotation.z = -(((h * 60) % 60) / 60) * 6.2832;
   }
-  // ---- Weather: overcast sky, rain outside, droplets on the glass ----
+  // ---- Weather ----
   const RN = 450,
     rpos = new Float32Array(RN * 6),
     rb = [];
@@ -3833,7 +3833,7 @@ gl_FragColor=vec4(c,1.);
     scrF = 0,
     ledT = 0;
   const TW_N = C(0x0d0f13);
-  // Outside extras: distant wind turbines (day) and a landmark tower with aircraft blinkers (night)
+  // ---- Wind turbines and landmark tower ----
   const turbines = [],
     twM = std(0xf1f3f5, 0.5),
     blinkers = [];
