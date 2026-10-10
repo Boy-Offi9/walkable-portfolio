@@ -15,6 +15,7 @@ Built with **Vite and three.js only**. No backend, no UI framework, no model fil
 - **Interactive details.** A pen writes each project into the notebook, a printer prints, the TV switches between a home screen and a project reel, and the terminal runs commands.
 - **Loading screen.** A branded intro with a progress bar. It waits for textures, models and shader compilation, then a tap on **Enter** starts the walk and, if left ticked, the music.
 - **Guided tour.** A spotlight walkthrough: the camera glides to each station, the screen dims and a glowing, scanner-style frame blooms around the TV, notebook, tablet, workstation, window and menu, with a short caption and step bar. The window step previews night, and the time is restored afterwards. Start it from the loading screen or the menu.
+- **Shareable links.** The address bar follows you: `#/projects/2` is the notebook on page 2, `#/window?t=night` is the window at night. Menu, then **Share this view** copies the link (or opens the share sheet on a phone) with the current time of day. Opening a link starts at that spot after you tap Enter. Places: `about`, `projects`, `skills`, `contact`, `window`. Time: `t=night`, `t=day` or an hour such as `t=18.5`.
 - **Your own media.** A profile photo, project screenshots and videos, and your own MP3s in place of the generated music, all set in the config file.
 - **Built for phones.** Touch joystick, tap to interact, quality presets and an adaptive guard that steps down when frames run slow.
 

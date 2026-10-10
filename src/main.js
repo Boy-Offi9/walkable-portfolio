@@ -63,7 +63,19 @@ const input = createInput(
 const music = createMusic(site.audio);
 W.setVideo(qtier !== 'low');
 
-const cfg = site.world,
+function readHash() {
+  const [path, qs = ''] = location.hash.slice(1).split('?'),
+    [place, pg] = path.split('/').filter(Boolean),
+    t = new URLSearchParams(qs).get('t'),
+    num = t != null && t !== '' ? Number(t) : NaN;
+  return {
+    place: place ? place.toLowerCase() : '',
+    pg: pg != null && Number.isFinite(+pg) ? +pg - 1 : null,
+    t: t === 'night' ? 22.5 : t === 'day' ? 12 : Number.isFinite(num) ? ((num % 24) + 24) % 24 : null,
+  };
+}
+const boot = readHash(),
+  cfg = site.world,
   dayLen = cfg.dayLengthSeconds || 120;
 let h = cfg.startHour == null ? 10.5 : cfg.startHour,
   playing = false,
@@ -71,6 +83,7 @@ let h = cfg.startHour == null ? 10.5 : cfg.startHour,
   live = false,
   liveOff = 0,
   wxInfo = null;
+if (boot.t != null) h = boot.t;
 const wrap24 = v => ((v % 24) + 24) % 24,
   liveHour = () => wrap24(Date.now() / 36e5 + liveOff);
 const manual = () => {
@@ -95,6 +108,25 @@ const go = (i, pg) => {
     ui.setPage();
   }
 };
+const toastEl = document.getElementById('toast');
+let toastT = 0;
+const toast = msg => {
+  toastEl.textContent = msg;
+  toastEl.classList.add('on');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => toastEl.classList.remove('on'), 1800);
+};
+const atView = () => Math.hypot(P.x - W.view.x, P.z - W.view.z) < 0.5;
+function hashFor(withTime) {
+  let path = '';
+  if (cur >= 0) {
+    path = W.st[cur].type;
+    if (cur === iProj) path += '/' + (W.book.page + 1);
+  } else if (atView()) path = 'window';
+  const t = withTime ? h : boot.t,
+    q = t == null ? '' : '?t=' + Math.round(t * 10) / 10;
+  return path || q ? '#/' + path + q : '';
+}
 const act = {
   go,
   next() {
@@ -142,6 +174,23 @@ const act = {
   },
   tv() {
     W.tv.toggle();
+  },
+  async share() {
+    const u = location.href.split('#')[0] + hashFor(true);
+    try {
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+        await navigator.share({ title: document.title, url: u });
+        return;
+      }
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+    }
+    try {
+      await navigator.clipboard.writeText(u);
+      toast('Link copied');
+    } catch (e) {
+      prompt('Copy this link', u);
+    }
   },
   toggleMusic: () => music.toggle(),
   termInput: v => W.term.setInput(v),
@@ -260,6 +309,21 @@ async function loadAssets(onP) {
   intro.classList.add('ready');
   ienter.focus({ preventScroll: true });
 })();
+function openHash() {
+  const { place, pg, t } = readHash();
+  if (t != null) {
+    manual();
+    tween = null;
+    playing = false;
+    h = t;
+  }
+  if (place === 'window') act.view();
+  else {
+    const i = W.st.findIndex(o => o.type === place);
+    if (i >= 0) go(i, pg);
+  }
+}
+addEventListener('hashchange', () => entered && !tour.active && openHash());
 const enter = withTour => {
   if (entered) return;
   entered = true;
@@ -271,6 +335,7 @@ const enter = withTour => {
   } catch (e) {}
   if (isndc.checked) ui.setMusic(music.toggle());
   if (withTour) setTimeout(tour.start, 700);
+  else openHash();
 };
 ienter.onclick = () => enter(false);
 itour.onclick = () => enter(true);
@@ -353,7 +418,8 @@ addEventListener('resize', size);
 size();
 syncPost();
 
-let last = performance.now();
+let last = performance.now(),
+  lastKey = '';
 function frame(now) {
   const dt = Math.min((now - last) / 1000, 0.05),
     t = now / 1000;
@@ -465,6 +531,15 @@ function frame(now) {
     ui.setStatus(status);
   }
   tour.update(dt);
+  if (entered && !warp && !tour.active) {
+    const key = cur + '|' + W.book.page + '|' + (cur < 0 && atView());
+    if (key !== lastKey) {
+      lastKey = key;
+      try {
+        history.replaceState(null, '', location.pathname + location.search + hashFor(false));
+      } catch (e) {}
+    }
+  }
   labels(cam, near);
   if (postOn && comp) comp.render(dt);
   else R.render(W.scene, cam);

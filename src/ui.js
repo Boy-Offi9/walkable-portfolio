@@ -263,6 +263,7 @@ export function initUI(site, st, act) {
   [
     ['Continue', 'Walk to the next station', act.next],
     ['Window view', 'See what is outside', act.view],
+    ['Share this view', 'Link to this spot and time of day', act.share],
     ['Daytime', 'Jump to 11:00', () => act.goTime(11)],
     ['Cyber night', 'Jump to 22:00', () => act.goTime(22)],
     ['Notebook', 'Open the projects', () => act.go(iProj)],
