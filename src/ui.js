@@ -5,7 +5,7 @@ const el = (tag, txt, cls) => {
   if (cls) e.className = cls;
   return e;
 };
-const safe = u => (/^(https?:|mailto:)/i.test(u) ? u : '#');
+const safe = u => (u && (/^(https?:|mailto:|tel:)/i.test(u) || !/^\s*(\w+:|\/\/)/.test(u)) ? u : '#');
 const link = (label, url, cls = 'btn') => {
   const a = el('a', label, cls);
   a.href = safe(url);
@@ -346,8 +346,16 @@ export function initUI(site, st, act) {
         p = site.projects[page],
         meta = el('div', null, 'meta');
       head.append(el('span', `Project ${page + 1} of ${count}`), tg);
+      const shot = p.image || (p.repo && `https://opengraph.githubassets.com/1/${p.repo}`);
+      if (shot) {
+        const im = el('img', null, 'shot');
+        im.alt = '';
+        im.loading = 'lazy';
+        im.onerror = () => im.remove();
+        im.src = shot;
+        card.append(head, im);
+      } else card.append(head);
       card.append(
-        head,
         el('h2', p.title),
         el('p', `${p.role} · ${p.year}`, 'r'),
         el('p', p.description, 'd'),
@@ -378,8 +386,15 @@ export function initUI(site, st, act) {
       }
     } else {
       head.append(el('span', d.title), tg);
+      card.append(head);
+      if (cs.type === 'about' && site.photo) {
+        const im = el('img', null, 'ava');
+        im.alt = '';
+        im.onerror = () => im.remove();
+        im.src = site.photo;
+        card.append(im);
+      }
       card.append(
-        head,
         el('h2', cs.type === 'about' ? site.name : cs.type === 'skills' ? 'What I work with' : 'Say hello')
       );
       if (cs.type === 'about')

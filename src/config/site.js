@@ -4,6 +4,8 @@ export const site = {
   role: 'Creative Developer',
   tagline: 'I build interfaces you can walk through.',
   bio: 'Mock data: replace this with a few sentences about you. Ada designs and ships interactive web experiences, from tiny tools to full 3D worlds.',
+  photo: '', // portrait for the TV, menu card and loading screen
+  favicon: '', // tab icon, e.g. "assets/profile/icon.png"
   accentColor: '34 211 238', // "R G B", no commas
   email: 'ada@example.com',
   links: [
@@ -11,6 +13,8 @@ export const site = {
     { label: 'Writing', url: 'https://example.com/blog' },
   ],
   skills: ['JavaScript', 'three.js', 'WebGL', 'Node.js', 'Design systems', 'Accessibility'],
+  // MP3 files under public/ replace the generated music. A string or a list that plays in order.
+  audio: { day: [], night: [], volume: 0.8 },
   // Notebook brainstorm lines
   ideas: [
     'Voice-guided tour of the room',
@@ -28,6 +32,7 @@ export const site = {
       url: 'https://example.com/orbit-notes',
       image: '', // file under public/ or a full URL
       repo: '', // or "owner/name" for a GitHub preview
+      video: '', // short muted mp4 loop shown on the TV reel
     },
     {
       title: 'Signal Garden',

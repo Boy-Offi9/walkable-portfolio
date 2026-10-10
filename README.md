@@ -14,6 +14,7 @@ Built with **Vite and three.js only**. No backend, no UI framework, no model fil
 - **Procedural PBR textures.** Wood, plaster, concrete, marble, fabric, leather, brushed metal and more are generated in code at start-up. Photo textures, an HDRI and GLB models are optional.
 - **Interactive details.** A pen writes each project into the notebook, a printer prints, the TV switches between a home screen and a project reel, and the terminal runs commands.
 - **Loading screen.** A branded intro with a progress bar. It waits for textures, models and shader compilation, then a tap on **Enter** starts the walk and, if left ticked, the music.
+- **Your own media.** A profile photo, project screenshots and videos, and your own MP3s in place of the generated music, all set in the config file.
 - **Built for phones.** Touch joystick, tap to interact, quality presets and an adaptive guard that steps down when frames run slow.
 
 ## Quick start
@@ -44,13 +45,25 @@ Edit `src/config/site.js`. It is the only file you need to touch.
 | `accentColor`                    | `"R G B"` with no commas. Reskins the UI and the world's neon                                     |
 | `email`, `links`                 | Contact details shown in the terminal and the dock                                                |
 | `skills`                         | Tiles on the tablet and the TV, and sketch labels on the whiteboard                               |
+| `photo`, `favicon`               | Portrait shown on the TV, the About card and the loading screen, and the browser tab icon         |
+| `audio`                          | MP3 files that replace the generated music (see Your own media)                                   |
 | `ideas`                          | Starred brainstorm lines on the notebook's left page                                              |
 | `projects`                       | Any number (1 to about 10). Each one is a notebook page, a polaroid, a poster and a TV reel slide |
 | `weather`                        | `{ lat, lon, label }` for live weather, or `null` to turn it off                                  |
 | `world`                          | `name` and `mark` (two letters) for the logo, `startHour`, `dayLengthSeconds`                     |
 | `assets`                         | Optional HD textures, HDRI and GLB models (see below)                                             |
 
-Each project takes `title`, `role`, `year`, `description`, `tags`, `url`, and optionally `image` (a file under `public/assets/` or a full URL) or `repo` (`"owner/name"`) for a taped photo on the notebook page. Without either, a wireframe doodle is drawn.
+Each project takes `title`, `role`, `year`, `description`, `tags`, `url`, and optionally `image`, `repo` or `video` (see Your own media).
+
+## Your own media
+
+Put files in `public/assets/` and use paths without a leading slash.
+
+- **Profile.** `photo: "assets/profile/me.jpg"` replaces the initials on the TV, and also shows in the About card and the loading screen. A square or portrait crop of about 512 px works best. `favicon` sets the tab icon. For a résumé, add a link: `{ label: "Résumé", url: "assets/profile/resume.pdf" }`.
+- **Projects.** `image` shows on the notebook page, the TV reel, the wall poster and the detail card. Use a landscape screenshot of about 1280x800. Large images are shrunk automatically. `repo: "owner/name"` uses the GitHub social preview when there is no `image`.
+- **Video.** `video: "assets/video/orbit.mp4"` plays muted on the TV reel instead of the still image. Keep it a short loop, under about 5 MB, H.264. It is skipped on the Low tier and stops when you walk away from the TV.
+- **Music.** `audio: { day: "assets/audio/day.mp3", night: ["assets/audio/n1.mp3", "assets/audio/n2.mp3"], volume: 0.8 }`. A list plays in order and repeats. Day and night crossfade with the timeline, and the lights pulse to the bass. Leave one empty to keep the generated track for that half of the day. Files stream, so they do not slow the loading screen, and a file that fails to load falls back to the generated music. Use music you have the rights to.
+- **Link preview.** Social sites read tags without running scripts. To set a share card, add `<meta property="og:image" content="https://your-site/assets/og.jpg" />` to `index.html`.
 
 ## Controls
 

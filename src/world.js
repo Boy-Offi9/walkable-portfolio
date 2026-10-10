@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { loadImage } from './media.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { makePBR, pbr, pbrT } from './materials.js';
@@ -543,6 +544,7 @@ gl_FragColor=vec4(c,1.);
   };
 
   // ---- Smart TV screen ----
+  let photoImg = null;
   const tvTex = screen(1024, 576, (x, W, H) => {
     const g = x.createLinearGradient(0, 0, W, H);
     g.addColorStop(0, '#0a1020');
@@ -581,19 +583,36 @@ gl_FragColor=vec4(c,1.);
     x.beginPath();
     x.arc(W - 190, 230, 105, 0, 6.283);
     x.fill();
-    x.fillStyle = '#04101a';
-    x.font = '800 80px "Exo 2",sans-serif';
-    x.textAlign = 'center';
-    x.fillText(
-      site.name
-        .split(/\s+/)
-        .map(w => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase(),
-      W - 190,
-      258
-    );
+    if (photoImg) {
+      x.save();
+      x.beginPath();
+      x.arc(W - 190, 230, 105, 0, 6.283);
+      x.clip();
+      const pw = photoImg.width,
+        ph = photoImg.height,
+        sc = Math.max(210 / pw, 210 / ph);
+      x.drawImage(photoImg, W - 190 - (pw * sc) / 2, 230 - (ph * sc) / 2, pw * sc, ph * sc);
+      x.restore();
+      x.strokeStyle = `rgb(${A})`;
+      x.lineWidth = 5;
+      x.beginPath();
+      x.arc(W - 190, 230, 105, 0, 6.283);
+      x.stroke();
+    } else {
+      x.fillStyle = '#04101a';
+      x.font = '800 80px "Exo 2",sans-serif';
+      x.textAlign = 'center';
+      x.fillText(
+        site.name
+          .split(/\s+/)
+          .map(w => w[0])
+          .join('')
+          .slice(0, 2)
+          .toUpperCase(),
+        W - 190,
+        258
+      );
+    }
     x.textAlign = 'left';
     site.skills.slice(0, 6).forEach((s, i) => {
       const tx = 48 + i * 156,
@@ -610,6 +629,13 @@ gl_FragColor=vec4(c,1.);
       x.textAlign = 'left';
     });
   });
+  if (site.photo)
+    loadImage(site.photo, 512)
+      .then(im => {
+        photoImg = im;
+        if (tvMode === 'home') tvTex.userData.go();
+      })
+      .catch(() => {});
   // ---- Tablet screen ----
   const tabTex = screen(640, 440, (x, W, H) => {
     const g = x.createLinearGradient(0, 0, W, H);
@@ -951,6 +977,7 @@ gl_FragColor=vec4(c,1.);
   const PW = 512,
     PH = 704,
     imgs = [],
+    posterPaint = [],
     hostOf = u => {
       try {
         return new URL(u).host;
@@ -1316,21 +1343,17 @@ gl_FragColor=vec4(c,1.);
     leafG.rotation.z = flipDir > 0 ? 0 : Math.PI;
     flipT = 0;
   }
-  projects.forEach((p, k) => {
+  projects.forEach(async (p, k) => {
     const urls = [p.image, p.repo && `https://opengraph.githubassets.com/1/${p.repo}`].filter(Boolean);
-    const next = () => {
-      const u = urls.shift();
-      if (!u) return;
-      const im = new Image();
-      im.crossOrigin = 'anonymous';
-      im.onload = () => {
-        imgs[k] = im;
-        if (k === page && flipT < 0) paintStatic();
-      };
-      im.onerror = next;
-      im.src = u;
-    };
-    next();
+    for (const u of urls) {
+      try {
+        imgs[k] = await loadImage(u);
+        break;
+      } catch (e) {}
+    }
+    if (!imgs[k]) return;
+    if (k === page && flipT < 0) paintStatic();
+    (posterPaint[k] || []).forEach(f => f());
   });
   paintStatic();
   redo.push(paintStatic);
@@ -1351,6 +1374,29 @@ gl_FragColor=vec4(c,1.);
       .join('')
       .slice(0, 2)
       .toUpperCase();
+  const vids = [];
+  let allowVideo = true,
+    reelVid = null;
+  const vidFor = k => {
+    const p = projects[k];
+    if (!allowVideo || !p || !p.video) return null;
+    if (vids[k] === undefined) {
+      const v = document.createElement('video');
+      v.muted = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.preload = 'auto';
+      v.crossOrigin = 'anonymous';
+      v.onerror = () => (vids[k] = null);
+      v.src = p.video;
+      vids[k] = v;
+    }
+    return vids[k];
+  };
+  const stopVid = () => {
+    if (reelVid) reelVid.pause();
+    reelVid = null;
+  };
   function paintReel(t) {
     const x = tvTex.image.getContext('2d'),
       W = 1024,
@@ -1359,7 +1405,8 @@ gl_FragColor=vec4(c,1.);
       idx = Math.floor(t / SL) % NP,
       ph = (t % SL) / SL,
       p = projects[idx],
-      im = imgs[idx],
+      vd = vidFor(idx),
+      im = vd && vd.readyState >= 2 ? vd : imgs[idx],
       z = 1 + ph * 0.08,
       fa = Math.min(1, ph * 6, (1 - ph) * 6);
     x.fillStyle = '#05080f';
@@ -1368,9 +1415,18 @@ gl_FragColor=vec4(c,1.);
     x.translate(W / 2, H / 2);
     x.scale(z, z);
     x.translate(-W / 2, -H / 2);
+    if (vd !== reelVid) {
+      stopVid();
+      if (vd) {
+        reelVid = vd;
+        vd.play().catch(() => {});
+      }
+    }
     if (im) {
-      const sc = Math.max(W / im.width, H / im.height);
-      x.drawImage(im, (W - im.width * sc) / 2, (H - im.height * sc) / 2, im.width * sc, im.height * sc);
+      const iw = im.videoWidth || im.width,
+        ih = im.videoHeight || im.height,
+        sc = Math.max(W / iw, H / ih);
+      x.drawImage(im, (W - iw * sc) / 2, (H - ih * sc) / 2, iw * sc, ih * sc);
     } else {
       const g = x.createLinearGradient(0, 0, W, H);
       g.addColorStop(0, `rgba(${A},.6)`);
@@ -1414,8 +1470,10 @@ gl_FragColor=vec4(c,1.);
     hits: [tvG, remote],
     toggle() {
       tvMode = tvMode === 'home' ? 'reel' : 'home';
-      if (tvMode === 'home') tvTex.userData.go();
-      else paintReel(performance.now() / 1000);
+      if (tvMode === 'home') {
+        stopVid();
+        tvTex.userData.go();
+      } else paintReel(performance.now() / 1000);
       return tvMode;
     },
   };
@@ -2637,7 +2695,7 @@ gl_FragColor=vec4(c,1.);
   [0, 1, 2].forEach(i => {
     const p = prj(i),
       hue = (i * 80 + 190) % 360;
-    const pt = tx2(256, 360, (x, W, H) => {
+    const paintPoster = (x, W, H) => {
       const g = x.createLinearGradient(0, 0, W, H);
       g.addColorStop(0, `hsl(${hue},70%,22%)`);
       g.addColorStop(1, `hsl(${(hue + 60) % 360},75%,48%)`);
@@ -2650,6 +2708,23 @@ gl_FragColor=vec4(c,1.);
         x.arc(200, 90, 20 + k * 22, 0, 6.28);
         x.stroke();
       }
+      const pim = imgs[i % NP];
+      if (pim) {
+        const pw = pim.width,
+          ph = pim.height,
+          sc = Math.max(W / pw, 180 / ph);
+        x.save();
+        x.beginPath();
+        x.rect(0, 0, W, 180);
+        x.clip();
+        x.drawImage(pim, (W - pw * sc) / 2, (180 - ph * sc) / 2, pw * sc, ph * sc);
+        x.restore();
+        const fade = x.createLinearGradient(0, 110, 0, 182);
+        fade.addColorStop(0, 'rgba(0,0,0,0)');
+        fade.addColorStop(1, `hsl(${hue},70%,20%)`);
+        x.fillStyle = fade;
+        x.fillRect(0, 110, W, 72);
+      }
       x.fillStyle = 'rgba(255,255,255,.9)';
       x.fillRect(22, 24, 36, 5);
       x.font = '800 30px ' + SF;
@@ -2659,6 +2734,11 @@ gl_FragColor=vec4(c,1.);
       x.fillStyle = 'rgba(255,255,255,.8)';
       x.fillText(String(p.role || '').slice(0, 28), 22, 300);
       x.fillText(((p.year || '') + '  ' + (p.tags || []).slice(0, 2).join(' · ')).slice(0, 30), 22, 322);
+    };
+    const pt = tx2(256, 360, paintPoster);
+    (posterPaint[i % NP] ||= []).push(() => {
+      paintPoster(pt.image.getContext('2d'), 256, 360);
+      pt.needsUpdate = true;
     });
     const z = -4.62 + i * 0.57;
     decal(pt, 0.46, 0.64, 3.962, 1.85, z, -Math.PI / 2);
@@ -4055,7 +4135,9 @@ gl_FragColor=vec4(c,1.);
     }
     if (tvMode === 'reel') {
       tvAcc += dt;
-      if (tvAcc > 0.1 && Math.hypot(cam.position.x + 3.9, cam.position.z - 1.2) < 9) {
+      const tvNear = Math.hypot(cam.position.x + 3.9, cam.position.z - 1.2) < 9;
+      if (!tvNear) stopVid();
+      else if (tvAcc > (reelVid ? 0.04 : 0.1)) {
         tvAcc = 0;
         paintReel(t);
       }
@@ -4287,6 +4369,10 @@ gl_FragColor=vec4(c,1.);
     obstacles: OB,
     mats: { floor: floor.material, walls: plaster, desk: wood },
     parts: { chair },
+    setVideo(on) {
+      allowVideo = on;
+      if (!on) stopVid();
+    },
     start: { x: 0.5, z: 3.6 },
     view: { x: 3.3, z: -1, look: [10, 1.1, -1.2] },
   };

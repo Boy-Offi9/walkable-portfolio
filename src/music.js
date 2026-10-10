@@ -1,5 +1,16 @@
-export function createMusic() {
-  let ctx,
+const asList = v => (Array.isArray(v) ? v : v ? [v] : []).filter(Boolean);
+
+export function createMusic(cfg = {}) {
+  const files = {},
+    vol = cfg.volume == null ? 0.8 : cfg.volume;
+  ['day', 'night'].forEach(k => {
+    const tracks = asList(cfg[k]);
+    files[k] = tracks.length ? { tracks, i: 0, ok: true, el: null } : null;
+  });
+  let analyser = null,
+    fbin = null,
+    avg = 0,
+    ctx,
     master,
     dayBus,
     nightBus,
@@ -113,15 +124,54 @@ export function createMusic() {
     if (st % 2 === 0) nz(nightBus, t, 0.03, 0.1, 'highpass', 8000);
     if (Math.random() < 0.55) tone(nightBus, 'square', mtof(NT[bar][st % 3] + 12), t, 0.12, 0.035, 2600);
   }
+  const fileOn = k => !!(files[k] && files[k].ok);
+  const hookFiles = () => {
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+    fbin = new Uint8Array(analyser.frequencyBinCount);
+    ['day', 'night'].forEach(k => {
+      const f = files[k];
+      if (!f) return;
+      const el = new Audio(),
+        g = ctx.createGain();
+      el.preload = 'none';
+      el.crossOrigin = 'anonymous';
+      el.loop = f.tracks.length === 1;
+      el.src = f.tracks[0];
+      el.onended = () => {
+        f.i = (f.i + 1) % f.tracks.length;
+        el.src = f.tracks[f.i];
+        el.play().catch(() => {});
+      };
+      el.onerror = () => {
+        f.ok = false;
+        el.pause();
+      };
+      g.gain.value = vol / 0.45;
+      ctx.createMediaElementSource(el).connect(g);
+      g.connect(k === 'day' ? dayBus : nightBus);
+      g.connect(analyser);
+      f.el = el;
+    });
+  };
+  const syncFiles = () =>
+    ['day', 'night'].forEach(k => {
+      const f = files[k];
+      if (!f || !f.el) return;
+      const w = k === 'day' ? 1 - night : night;
+      if (on && f.ok && w > 0.02) {
+        if (f.el.paused) f.el.play().catch(() => {});
+      } else if (!f.el.paused) f.el.pause();
+    });
   const tick = () => {
     const now = ctx.currentTime;
     while (nD < now + 0.15) {
-      if (1 - night > 0.04) lofi(sD, nD);
+      if (1 - night > 0.04 && !fileOn('day')) lofi(sD, nD);
       sD++;
       nD += 60 / 76 / 4;
     }
     while (nN < now + 0.15) {
-      if (night > 0.04) synth(sN, nN);
+      if (night > 0.04 && !fileOn('night')) synth(sN, nN);
       sN++;
       nN += 60 / 100 / 4;
     }
@@ -141,6 +191,7 @@ export function createMusic() {
           d = b.getChannelData(0);
         for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
         noise = b;
+        hookFiles();
       }
       on = !on;
       ctx.resume();
@@ -153,6 +204,7 @@ export function createMusic() {
         clearInterval(timer);
         master.gain.setTargetAtTime(0, ctx.currentTime, 0.2);
         kicks.length = 0;
+        syncFiles();
       }
       return on;
     },
@@ -161,6 +213,7 @@ export function createMusic() {
       if (ctx) {
         dayBus.gain.setTargetAtTime(1 - n, ctx.currentTime, 0.4);
         nightBus.gain.setTargetAtTime(n, ctx.currentTime, 0.4);
+        syncFiles();
       }
     },
     level(dt) {
@@ -172,6 +225,14 @@ export function createMusic() {
       while (kicks.length && kicks[0] <= now) {
         beat = 1;
         kicks.shift();
+      }
+      if (analyser && ['day', 'night'].some(k => files[k] && files[k].el && !files[k].el.paused)) {
+        analyser.getByteFrequencyData(fbin);
+        let e = 0;
+        for (let i = 0; i < 6; i++) e += fbin[i];
+        e /= 6 * 255;
+        avg += (e - avg) * Math.min(1, dt * 2);
+        beat = Math.max(beat, Math.min(1, Math.max(0, e - avg) * 5));
       }
       beat *= Math.exp(-dt * 7);
       return beat;

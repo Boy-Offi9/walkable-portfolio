@@ -59,7 +59,8 @@ const input = createInput(
   },
   onTap
 );
-const music = createMusic();
+const music = createMusic(site.audio);
+W.setVideo(qtier !== 'low');
 
 const cfg = site.world,
   dayLen = cfg.dayLengthSeconds || 120;
@@ -200,7 +201,23 @@ const intro = document.getElementById('intro'),
   istat = document.getElementById('istat'),
   ienter = document.getElementById('ienter'),
   isndc = document.getElementById('isndc');
-document.getElementById('imark').textContent = site.world.mark;
+const imark = document.getElementById('imark');
+imark.textContent = site.world.mark;
+if (site.photo) {
+  const pic = new Image();
+  pic.alt = '';
+  pic.onload = () => imark.replaceChildren(pic);
+  pic.src = site.photo;
+}
+if (site.favicon) {
+  let ico = document.querySelector('link[rel~="icon"]');
+  if (!ico) {
+    ico = document.createElement('link');
+    ico.rel = 'icon';
+    document.head.append(ico);
+  }
+  ico.href = site.favicon;
+}
 document.getElementById('iname').textContent = site.name;
 document.getElementById('irole').textContent = site.role;
 try {
@@ -299,6 +316,7 @@ async function syncPost() {
 function applyQuality(t) {
   qtier = t;
   W.setQuality(t);
+  W.setVideo(t !== 'low');
   if (entered && RANK[t] > assetRank) loadAssets();
   size();
   syncPost();
