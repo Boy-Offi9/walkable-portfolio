@@ -14,6 +14,7 @@ Built with **Vite and three.js only**. No backend, no UI framework, no model fil
 - **Procedural PBR textures.** Wood, plaster, concrete, marble, fabric, leather, brushed metal and more are generated in code at start-up. Photo textures, an HDRI and GLB models are optional.
 - **Interactive details.** A pen writes each project into the notebook, a printer prints, the TV switches between a home screen and a project reel, and the terminal runs commands.
 - **Loading screen.** A branded intro with a progress bar. It waits for textures, models and shader compilation, then a tap on **Enter** starts the walk and, if left ticked, the music.
+- **Guided tour.** A spotlight walkthrough: the camera glides to each station, the screen dims and a glowing, scanner-style frame blooms around the TV, notebook, tablet, workstation, window and menu, with a short caption and step bar. The window step previews night, and the time is restored afterwards. Start it from the loading screen or the menu.
 - **Your own media.** A profile photo, project screenshots and videos, and your own MP3s in place of the generated music, all set in the config file.
 - **Built for phones.** Touch joystick, tap to interact, quality presets and an adaptive guard that steps down when frames run slow.
 
@@ -39,19 +40,20 @@ Requires Node 18 or newer and a browser with WebGL 2.
 
 Edit `src/config/site.js`. It is the only file you need to touch.
 
-| Field                            | What it does                                                                                      |
-| -------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `name`, `role`, `tagline`, `bio` | Shown on the TV, in the menu and in the page title                                                |
-| `accentColor`                    | `"R G B"` with no commas. Reskins the UI and the world's neon                                     |
-| `email`, `links`                 | Contact details shown in the terminal and the dock                                                |
-| `skills`                         | Tiles on the tablet and the TV, and sketch labels on the whiteboard                               |
-| `photo`, `favicon`               | Portrait shown on the TV, the About card and the loading screen, and the browser tab icon         |
-| `audio`                          | MP3 files that replace the generated music (see Your own media)                                   |
-| `ideas`                          | Starred brainstorm lines on the notebook's left page                                              |
-| `projects`                       | Any number (1 to about 10). Each one is a notebook page, a polaroid, a poster and a TV reel slide |
-| `weather`                        | `{ lat, lon, label }` for live weather, or `null` to turn it off                                  |
-| `world`                          | `name` and `mark` (two letters) for the logo, `startHour`, `dayLengthSeconds`                     |
-| `assets`                         | Optional HD textures, HDRI and GLB models (see below)                                             |
+| Field                            | What it does                                                                                                |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `name`, `role`, `tagline`, `bio` | Shown on the TV, in the menu and in the page title                                                          |
+| `accentColor`                    | `"R G B"` with no commas. Reskins the UI and the world's neon                                               |
+| `email`, `links`                 | Contact details shown in the terminal and the dock                                                          |
+| `skills`                         | Tiles on the tablet and the TV, and sketch labels on the whiteboard                                         |
+| `photo`, `favicon`               | Portrait shown on the TV, the About card and the loading screen, and the browser tab icon                   |
+| `audio`                          | MP3 files that replace the generated music (see Your own media)                                             |
+| `tour`                           | `false` removes the tour. Or give `about`, `projects`, `skills`, `contact` strings to replace a step's text |
+| `ideas`                          | Starred brainstorm lines on the notebook's left page                                                        |
+| `projects`                       | Any number (1 to about 10). Each one is a notebook page, a polaroid, a poster and a TV reel slide           |
+| `weather`                        | `{ lat, lon, label }` for live weather, or `null` to turn it off                                            |
+| `world`                          | `name` and `mark` (two letters) for the logo, `startHour`, `dayLengthSeconds`                               |
+| `assets`                         | Optional HD textures, HDRI and GLB models (see below)                                                       |
 
 Each project takes `title`, `role`, `year`, `description`, `tags`, `url`, and optionally `image`, `repo` or `video` (see Your own media).
 

@@ -8,6 +8,7 @@ import { createLabels } from './labels.js';
 import { applyAssets, resolveAssets } from './assets.js';
 import { createMusic } from './music.js';
 import { fetchWeather } from './weather.js';
+import { createTour } from './tour.js';
 
 const cv = document.getElementById('c'),
   hint = document.getElementById('hint');
@@ -196,10 +197,21 @@ function onTap(e) {
   act.page(W.book.group.worldToLocal(bh.point.clone()).x > 0 ? 1 : -1);
 }
 
+const tour = createTour({
+  site,
+  W,
+  cam,
+  go,
+  view: act.view,
+  settled: () => !warp && Math.abs(zoom - zoomT) < 0.02,
+  hour: () => h,
+  goTime: act.goTime,
+});
 const intro = document.getElementById('intro'),
   ibar = intro.querySelector('#ibar i'),
   istat = document.getElementById('istat'),
   ienter = document.getElementById('ienter'),
+  itour = document.getElementById('itour'),
   isndc = document.getElementById('isndc');
 const imark = document.getElementById('imark');
 imark.textContent = site.world.mark;
@@ -244,11 +256,11 @@ async function loadAssets(onP) {
     await R.compileAsync(W.scene, cam);
   } catch (e) {}
   setP(1, 'Ready');
-  ienter.disabled = false;
+  ienter.disabled = itour.disabled = false;
   intro.classList.add('ready');
   ienter.focus({ preventScroll: true });
 })();
-ienter.onclick = () => {
+const enter = withTour => {
   if (entered) return;
   entered = true;
   intro.classList.add('out');
@@ -258,6 +270,20 @@ ienter.onclick = () => {
     localStorage.setItem('walk-sound', isndc.checked ? '1' : '0');
   } catch (e) {}
   if (isndc.checked) ui.setMusic(music.toggle());
+  if (withTour) setTimeout(tour.start, 700);
+};
+ienter.onclick = () => enter(false);
+itour.onclick = () => enter(true);
+const ttour = document.getElementById('ttour');
+if (site.tour === false) {
+  itour.remove();
+  ttour.remove();
+}
+ttour.onclick = () => {
+  if (!entered || tour.active) return;
+  const panel = document.getElementById('panel');
+  if (!panel.inert) document.getElementById('pclose').click();
+  setTimeout(tour.start, 350);
 };
 
 const baseFov = () => (cam.aspect < 1 ? 80 : 70);
@@ -351,7 +377,7 @@ function frame(now) {
   }
 
   const L = input.look,
-    { sx, sf } = entered ? input.axes() : { sx: 0, sf: 0 },
+    { sx, sf } = entered && !tour.active ? input.axes() : { sx: 0, sf: 0 },
     sn = Math.sin(L.yaw),
     cs = Math.cos(L.yaw);
   let dx = cs * sx - sn * sf,
@@ -438,6 +464,7 @@ function frame(now) {
     lastStatus = status;
     ui.setStatus(status);
   }
+  tour.update(dt);
   labels(cam, near);
   if (postOn && comp) comp.render(dt);
   else R.render(W.scene, cam);

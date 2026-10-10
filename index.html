@@ -25,10 +25,36 @@
         <div id="ibar"><i></i></div>
         <p id="istat" aria-live="polite">Building the room</p>
         <button id="ienter" type="button" disabled>Enter</button>
+        <button id="itour" type="button" disabled>Take the tour</button>
         <label id="isnd"><input id="isndc" type="checkbox" checked /> Sound on</label>
       </div>
     </div>
     <div id="labels"></div>
+    <div id="tour" hidden>
+      <svg id="tsvg" aria-hidden="true">
+        <defs>
+          <mask id="tmask">
+            <rect width="100%" height="100%" fill="#fff" />
+            <rect id="thole" width="0" height="0" fill="#000" />
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill="rgba(3,8,18,0.82)" mask="url(#tmask)" />
+        <line id="tline" />
+        <circle id="tdot" r="4" />
+      </svg>
+      <div id="tring" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <section id="tcard" class="glass" role="dialog" aria-live="polite" aria-labelledby="ttitle">
+        <div class="tn"><b id="tnum">01</b><span id="tof"></span></div>
+        <h3 id="ttitle"></h3>
+        <p id="ttext"></p>
+        <div id="tdots"></div>
+        <div class="tbtns">
+          <button id="tskip" type="button" class="pill">Skip</button>
+          <button id="tback" type="button" class="pill">Back</button>
+          <button id="tnext" type="button" class="btn">Next</button>
+        </div>
+      </section>
+    </div>
 
     <button id="menu" type="button" class="glass" aria-expanded="false" aria-controls="panel">
       <span id="mark"></span><b>Menu</b>
@@ -51,6 +77,7 @@
 
         <h4>Go to</h4>
         <nav id="pills" aria-label="Stations"></nav>
+        <button id="ttour" type="button" class="pill">Guided tour</button>
 
         <h4>Time of day</h4>
         <div id="time">

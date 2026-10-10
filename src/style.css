@@ -831,3 +831,219 @@ a.pill {
     transition: none;
   }
 }
+
+#itour {
+  height: 38px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+#itour:disabled {
+  opacity: 0.3;
+}
+#ttour {
+  margin-top: 8px;
+}
+body.touring #card,
+body.touring #hint,
+body.touring #dock,
+body.touring #labels {
+  display: none;
+}
+#tour {
+  position: fixed;
+  inset: 0;
+  z-index: 18;
+  touch-action: none;
+  transition: opacity 0.4s;
+}
+#tour[hidden] {
+  display: none;
+}
+#tour.out {
+  opacity: 0;
+  pointer-events: none;
+}
+#tsvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+#tline {
+  stroke: rgb(var(--a));
+  stroke-width: 1.5;
+  stroke-dasharray: 3 5;
+  opacity: 0;
+}
+#tdot {
+  fill: rgb(var(--a));
+  opacity: 0;
+}
+#tring {
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid rgb(var(--a));
+  box-shadow:
+    0 0 28px rgb(var(--a) / 0.55),
+    inset 0 0 24px rgb(var(--a) / 0.16);
+}
+#tring::before,
+#tring::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid rgb(var(--a));
+  border-radius: inherit;
+  opacity: 0;
+  animation: tripple 2.6s ease-out infinite;
+}
+#tring::after {
+  animation-delay: 1.3s;
+}
+@keyframes tripple {
+  0% {
+    inset: -2px;
+    opacity: 0.7;
+  }
+  100% {
+    inset: -30px;
+    opacity: 0;
+  }
+}
+#tring i {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #fff;
+  animation: tbr 1.8s ease-in-out infinite;
+}
+#tring i:nth-child(1) {
+  left: -8px;
+  top: -8px;
+  border-right: 0;
+  border-bottom: 0;
+  border-top-left-radius: 8px;
+}
+#tring i:nth-child(2) {
+  right: -8px;
+  top: -8px;
+  border-left: 0;
+  border-bottom: 0;
+  border-top-right-radius: 8px;
+}
+#tring i:nth-child(3) {
+  left: -8px;
+  bottom: -8px;
+  border-right: 0;
+  border-top: 0;
+  border-bottom-left-radius: 8px;
+}
+#tring i:nth-child(4) {
+  right: -8px;
+  bottom: -8px;
+  border-left: 0;
+  border-top: 0;
+  border-bottom-right-radius: 8px;
+}
+@keyframes tbr {
+  50% {
+    opacity: 0.45;
+  }
+}
+#tcard {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 14px 16px 14px;
+  background: rgba(8, 14, 26, 0.9);
+  border-color: rgb(var(--a) / 0.35);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  transition:
+    left 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+#tour.swap #ttitle,
+#tour.swap #ttext,
+#tour.swap .tn {
+  animation: tin 0.4s ease-out both;
+}
+#tour.swap #ttext {
+  animation-delay: 0.05s;
+}
+@keyframes tin {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.tn {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+#tnum {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: rgb(var(--a));
+  text-shadow: 0 0 18px rgb(var(--a) / 0.6);
+  font-variant-numeric: tabular-nums;
+}
+#tof {
+  font-size: 12px;
+  color: var(--mut);
+}
+#ttitle {
+  margin: 6px 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+}
+#ttext {
+  margin: 0;
+  font-size: 14.5px;
+  color: #c9dcee;
+}
+#tdots {
+  display: flex;
+  gap: 4px;
+  margin: 12px 0;
+}
+#tdots i {
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.14);
+}
+#tdots i.d {
+  background: rgb(var(--a) / 0.5);
+}
+#tdots i.n {
+  background: rgb(var(--a));
+  box-shadow: 0 0 8px rgb(var(--a));
+}
+.tbtns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tbtns #tskip {
+  margin-right: auto;
+  background: transparent;
+}
+.tbtns [hidden] {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #tring::before,
+  #tring::after,
+  #tring i {
+    animation: none;
+  }
+  #tcard {
+    transition: none;
+  }
+}

@@ -15,6 +15,8 @@ export const site = {
   skills: ['JavaScript', 'three.js', 'WebGL', 'Node.js', 'Design systems', 'Accessibility'],
   // MP3 files under public/ replace the generated music. A string or a list that plays in order.
   audio: { day: [], night: [], volume: 0.8 },
+  // Guided tour. Set to false to remove it, or override the text of a step.
+  tour: { about: '', projects: '', skills: '', contact: '' },
   // Notebook brainstorm lines
   ideas: [
     'Voice-guided tour of the room',
