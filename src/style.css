@@ -51,24 +51,116 @@ input:focus-visible {
   border: 1px solid var(--line);
   border-radius: 14px;
 }
-#load {
+#intro {
   position: fixed;
-  z-index: 9;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.08);
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(5, 11, 22, 0.5), rgba(5, 11, 22, 0.95));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition:
+    opacity 0.6s ease,
+    visibility 0.6s;
 }
-#load i {
+#intro.out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+#intro .in {
+  width: min(340px, 100%);
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+}
+#imark {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgb(var(--a));
+  color: rgb(var(--a));
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 28px rgb(var(--a) / 0.35);
+}
+#iname {
+  margin: 10px 0 0;
+  font-size: clamp(26px, 7vw, 34px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+#irole {
+  margin: 0;
+  color: var(--mut);
+}
+#ibar {
+  width: 100%;
+  height: 3px;
+  margin-top: 16px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+}
+#ibar i {
   display: block;
   height: 100%;
   width: 0;
   background: rgb(var(--a));
-  transition: width 0.3s;
+  transition: width 0.35s;
 }
-#load[hidden] {
-  display: none;
+#istat {
+  min-height: 1.3em;
+  margin: 0;
+  font-size: 13px;
+  color: var(--mut);
+}
+#ienter {
+  min-width: 160px;
+  height: 46px;
+  margin-top: 8px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(var(--a));
+  color: #04101a;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  transition: opacity 0.3s;
+}
+#ienter:disabled {
+  opacity: 0.3;
+}
+#intro.ready #ienter {
+  animation: ipulse 1.8s ease-in-out infinite;
+}
+@keyframes ipulse {
+  50% {
+    box-shadow: 0 0 0 10px rgb(var(--a) / 0.18);
+  }
+}
+#isnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--mut);
+}
+#isnd input {
+  accent-color: rgb(var(--a));
+}
+@media (prefers-reduced-motion: reduce) {
+  #intro.ready #ienter {
+    animation: none;
+  }
 }
 
 #labels {

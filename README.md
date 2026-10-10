@@ -13,6 +13,7 @@ Built with **Vite and three.js only**. No backend, no UI framework, no model fil
 - **Generated music.** Lo-fi by day and synthwave at night, synthesised with WebAudio. No audio files. The RGB lights pulse to the beat.
 - **Procedural PBR textures.** Wood, plaster, concrete, marble, fabric, leather, brushed metal and more are generated in code at start-up. Photo textures, an HDRI and GLB models are optional.
 - **Interactive details.** A pen writes each project into the notebook, a printer prints, the TV switches between a home screen and a project reel, and the terminal runs commands.
+- **Loading screen.** A branded intro with a progress bar. It waits for textures, models and shader compilation, then a tap on **Enter** starts the walk and, if left ticked, the music.
 - **Built for phones.** Touch joystick, tap to interact, quality presets and an adaptive guard that steps down when frames run slow.
 
 ## Quick start
@@ -92,6 +93,7 @@ Static furniture is merged per material at start-up, so the room costs a few doz
 Everything works with no files. To upgrade the look, fill in `assets` in `src/config/site.js` and put files in `public/assets/`. Paths have no leading slash, for example `assets/textures/floor_color.jpg`.
 
 - **Textures** for `floor`, `walls` and `desk`, each with `color`, `normal` and `rough` maps. Wall and wood textures are sized in real metres, so `repeat: [1, 1]` means one tile per 2 m on walls and 0.9 m on wood. Raise it to shrink the pattern.
+- **Tiers.** Everything in `assets` loads on Medium and High. Put heavier files (2K or 4K textures, a bigger HDRI, extra models) in `assets.high` and they replace the base files on the High tier only, and a model with `tier: "high"` is skipped on Medium. Low loads none. Auto picks High on desktop and Medium on phones, so phone visitors get the light set unless they choose High in the menu. Switching up loads the heavier files on the fly. Switching down keeps what has already loaded until you reload.
 - **HDRI** (`assets.hdri`): an equirectangular `.hdr` for real reflections.
 - **Models**: GLB files with `position`, `rotationY` and `scale`. `replace: "chair"` hides the built-in office chair, and `blocker: [x0, x1, z0, z1]` adds an area visitors cannot walk through.
 - **Fetch textures for you**: `npm run textures` downloads CC0 sets from Poly Haven into `public/assets/textures` and prints the snippet to paste into `site.js`. Poly Haven's API is free for non-commercial use only. For a commercial site, download the sets by hand from polyhaven.com and check the ids at the top of `scripts/fetch-textures.mjs`.

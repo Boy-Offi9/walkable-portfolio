@@ -5,7 +5,7 @@ import { buildWorld } from './world.js';
 import { createInput } from './controls.js';
 import { initUI } from './ui.js';
 import { createLabels } from './labels.js';
-import { applyAssets } from './assets.js';
+import { applyAssets, resolveAssets } from './assets.js';
 import { createMusic } from './music.js';
 import { fetchWeather } from './weather.js';
 
@@ -195,19 +195,53 @@ function onTap(e) {
   act.page(W.book.group.worldToLocal(bh.point.clone()).x > 0 ? 1 : -1);
 }
 
-const bar = document.getElementById('load');
-if (qtier !== 'low' && site.assets) {
-  applyAssets(R, W, site.assets, p => {
-    bar.firstChild.style.width = p * 100 + '%';
-    if (p >= 1)
-      setTimeout(() => {
-        bar.hidden = true;
-      }, 500);
-  }).catch(e => {
-    console.warn(e);
-    bar.hidden = true;
-  });
-} else bar.hidden = true;
+const intro = document.getElementById('intro'),
+  ibar = intro.querySelector('#ibar i'),
+  istat = document.getElementById('istat'),
+  ienter = document.getElementById('ienter'),
+  isndc = document.getElementById('isndc');
+document.getElementById('imark').textContent = site.world.mark;
+document.getElementById('iname').textContent = site.name;
+document.getElementById('irole').textContent = site.role;
+try {
+  isndc.checked = localStorage.getItem('walk-sound') !== '0';
+} catch (e) {}
+let entered = false,
+  assetRank = -1;
+const RANK = { low: 0, medium: 1, high: 2 };
+async function loadAssets(onP) {
+  const a = resolveAssets(site.assets, qtier);
+  if (!a || RANK[qtier] <= assetRank) return onP && onP(1);
+  assetRank = RANK[qtier];
+  await applyAssets(R, W, a, onP || (() => {})).catch(e => console.warn(e));
+}
+(async () => {
+  const setP = (p, label) => {
+    ibar.style.width = p * 100 + '%';
+    if (label) istat.textContent = label;
+  };
+  setP(0.15, 'Building the room');
+  await loadAssets(p => setP(0.15 + p * 0.7, p < 1 ? 'Loading textures and models' : ''));
+  setP(0.9, 'Compiling shaders');
+  try {
+    await R.compileAsync(W.scene, cam);
+  } catch (e) {}
+  setP(1, 'Ready');
+  ienter.disabled = false;
+  intro.classList.add('ready');
+  ienter.focus({ preventScroll: true });
+})();
+ienter.onclick = () => {
+  if (entered) return;
+  entered = true;
+  intro.classList.add('out');
+  setTimeout(() => intro.remove(), 700);
+  guard.start = performance.now() + 2500;
+  try {
+    localStorage.setItem('walk-sound', isndc.checked ? '1' : '0');
+  } catch (e) {}
+  if (isndc.checked) ui.setMusic(music.toggle());
+};
 
 const baseFov = () => (cam.aspect < 1 ? 80 : 70);
 function size() {
@@ -265,6 +299,7 @@ async function syncPost() {
 function applyQuality(t) {
   qtier = t;
   W.setQuality(t);
+  if (entered && RANK[t] > assetRank) loadAssets();
   size();
   syncPost();
   ui.setQuality(qpref, qtier);
@@ -298,7 +333,7 @@ function frame(now) {
   }
 
   const L = input.look,
-    { sx, sf } = input.axes(),
+    { sx, sf } = entered ? input.axes() : { sx: 0, sf: 0 },
     sn = Math.sin(L.yaw),
     cs = Math.cos(L.yaw);
   let dx = cs * sx - sn * sf,

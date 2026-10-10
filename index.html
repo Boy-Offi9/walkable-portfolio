@@ -12,7 +12,17 @@
   </head>
   <body>
     <canvas id="c"></canvas>
-    <div id="load"><i></i></div>
+    <div id="intro" role="dialog" aria-modal="true" aria-labelledby="iname">
+      <div class="in">
+        <span id="imark"></span>
+        <h1 id="iname"></h1>
+        <p id="irole"></p>
+        <div id="ibar"><i></i></div>
+        <p id="istat" aria-live="polite">Building the room</p>
+        <button id="ienter" type="button" disabled>Enter</button>
+        <label id="isnd"><input id="isndc" type="checkbox" checked /> Sound on</label>
+      </div>
+    </div>
     <div id="labels"></div>
 
     <button id="menu" type="button" class="glass" aria-expanded="false" aria-controls="panel">

@@ -71,6 +71,15 @@ export const site = {
     floor: { color: '', normal: '', rough: '', repeat: [4, 5] },
     walls: { color: '', normal: '', rough: '', repeat: [1, 1] }, // 1 tile = 2 m
     desk: { color: '', normal: '', rough: '', repeat: [1, 1] }, // 1 tile = 0.9 m
+    // Heavier files for the High tier. Any slot left empty falls back to the files above.
+    high: {
+      hdri: '',
+      floor: { color: '', normal: '', rough: '', repeat: [4, 5] },
+      walls: { color: '', normal: '', rough: '', repeat: [1, 1] },
+      desk: { color: '', normal: '', rough: '', repeat: [1, 1] },
+      models: [],
+    },
+    // Add tier: "high" to a model to load it on the High tier only.
     models: [
       // { url: "assets/models/chair.glb", position: [-1.07, 0, -3.45], rotationY: 0.35, scale: 1,
       //   replace: "chair",

@@ -409,6 +409,10 @@ export function initUI(site, st, act) {
       tl.value = h;
       clock.textContent = fmt(h);
     },
+    setMusic(on) {
+      mus.classList.toggle('on', on);
+      mus.setAttribute('aria-pressed', String(on));
+    },
     setQuality(pref, tier) {
       const c = v => v[0].toUpperCase() + v.slice(1);
       if (qLabel) qLabel.textContent = `Quality: ${pref === 'auto' ? 'Auto (' + c(tier) + ')' : c(pref)}`;
