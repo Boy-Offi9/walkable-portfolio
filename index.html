@@ -26,10 +26,12 @@
         <p id="istat" aria-live="polite">Building the room</p>
         <button id="ienter" type="button" disabled>Enter</button>
         <button id="itour" type="button" disabled>Take the tour</button>
+        <button id="ilist" type="button">Text version</button>
         <label id="isnd"><input id="isndc" type="checkbox" checked /> Sound on</label>
       </div>
     </div>
     <div id="labels"></div>
+    <div id="list" role="dialog" aria-modal="true" aria-labelledby="lname" hidden></div>
     <div id="tour" hidden>
       <svg id="tsvg" aria-hidden="true">
         <defs>
@@ -78,6 +80,7 @@
         <h4>Go to</h4>
         <nav id="pills" aria-label="Stations"></nav>
         <button id="ttour" type="button" class="pill">Guided tour</button>
+        <button id="tlist" type="button" class="pill">Text version</button>
 
         <h4>Time of day</h4>
         <div id="time">

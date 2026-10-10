@@ -1,11 +1,5 @@
+import { el, safe } from './util.js';
 const $ = id => document.getElementById(id);
-const el = (tag, txt, cls) => {
-  const e = document.createElement(tag);
-  if (txt != null) e.textContent = txt;
-  if (cls) e.className = cls;
-  return e;
-};
-const safe = u => (u && (/^(https?:|mailto:|tel:)/i.test(u) || !/^\s*(\w+:|\/\/)/.test(u)) ? u : '#');
 const link = (label, url, cls = 'btn') => {
   const a = el('a', label, cls);
   a.href = safe(url);

@@ -9,15 +9,24 @@ import { applyAssets, resolveAssets } from './assets.js';
 import { createMusic } from './music.js';
 import { fetchWeather } from './weather.js';
 import { createTour } from './tour.js';
+import { createList } from './list.js';
 
 const cv = document.getElementById('c'),
   hint = document.getElementById('hint');
+const list = createList(site, {
+  onClose() {
+    lastKey = '';
+    try {
+      history.replaceState(null, '', location.pathname + location.search);
+    } catch (e) {}
+  },
+});
 const RM = matchMedia('(prefers-reduced-motion:reduce)').matches;
 let R;
 try {
   R = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
 } catch (e) {
-  hint.textContent = 'WebGL is not available on this device.';
+  list.open({ noGL: true });
   throw e;
 }
 R.toneMapping = THREE.ACESFilmicToneMapping;
@@ -311,6 +320,7 @@ async function loadAssets(onP) {
 })();
 function openHash() {
   const { place, pg, t } = readHash();
+  if (place === 'list') return openList();
   if (t != null) {
     manual();
     tween = null;
@@ -324,6 +334,12 @@ function openHash() {
   }
 }
 addEventListener('hashchange', () => entered && !tour.active && openHash());
+function openList() {
+  list.open();
+  try {
+    history.replaceState(null, '', location.pathname + location.search + '#/list');
+  } catch (e) {}
+}
 const enter = withTour => {
   if (entered) return;
   entered = true;
@@ -339,11 +355,18 @@ const enter = withTour => {
 };
 ienter.onclick = () => enter(false);
 itour.onclick = () => enter(true);
+document.getElementById('ilist').onclick = openList;
+if (boot.place === 'list') openList();
 const ttour = document.getElementById('ttour');
 if (site.tour === false) {
   itour.remove();
   ttour.remove();
 }
+document.getElementById('tlist').onclick = () => {
+  const panel = document.getElementById('panel');
+  if (!panel.inert) document.getElementById('pclose').click();
+  openList();
+};
 ttour.onclick = () => {
   if (!entered || tour.active) return;
   const panel = document.getElementById('panel');
@@ -443,7 +466,7 @@ function frame(now) {
   }
 
   const L = input.look,
-    { sx, sf } = entered && !tour.active ? input.axes() : { sx: 0, sf: 0 },
+    { sx, sf } = entered && !tour.active && !list.active ? input.axes() : { sx: 0, sf: 0 },
     sn = Math.sin(L.yaw),
     cs = Math.cos(L.yaw);
   let dx = cs * sx - sn * sf,
@@ -531,7 +554,7 @@ function frame(now) {
     ui.setStatus(status);
   }
   tour.update(dt);
-  if (entered && !warp && !tour.active) {
+  if (entered && !warp && !tour.active && !list.active) {
     const key = cur + '|' + W.book.page + '|' + (cur < 0 && atView());
     if (key !== lastKey) {
       lastKey = key;
